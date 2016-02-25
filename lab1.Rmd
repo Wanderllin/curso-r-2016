@@ -1,0 +1,111 @@
+---
+title: "Lab1 - Aula 1"
+author: "Vanderlin Amorim Júnior - Curso Verão 2016 - R"
+date: "25 de fevereiro de 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+## Aula 01 - Laboratório
+
+ 1) Uma função em R, chamada moeda com o parâmetro p a probabilidade de ser cara. 
+ A função deve retornar 1 se o resultado do lançamento for cara e 0 caso contrário.
+ usando a função runif(n, min = 0, max = 1)
+ A função runif(1) gera um número aleatório no intervalo unitário toda vez que a condição é avaliada
+ Função moedas
+
+
+```{r moeda}
+moeda <- function(p){
+  x<- runif(1)
+  if(x < p){
+    1
+  } else {
+    0
+  }
+}
+```
+
+
+
+ 2) Uma função chamada moedas com os parâmetros n e p que simula o lançamento de n moedas 
+ com probabilidade p de serem cara e retorna um vetor de 0’s e 1’s com os resultados 
+ obtidos em cada um dos lançamentos.
+ Função moedas
+
+```{r }
+
+moedas <- function(n, p){
+  y <- c(1:n)
+  for(i in 1:n) {
+    x <- runif(1)
+    if(x < p){
+      y[i]<-1
+    } else {
+      y[i]<-0
+    }
+  }
+  return(y)
+}
+
+```
+
+
+
+3) Uma função chamada proporcao com parâmetro resultados (que é um vetor de 0’s e 1’s) e retorna a proporção de 1’s neste vetor.
+
+```{r proporcao }
+
+resultados <- c(1,1,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1)
+
+proporcao <- function(resultados) {
+  x = 0
+  y = 0
+  for(i in seq_along(resultados)) {
+    if(resultados[i] == 1) {
+      x = x +1
+    }
+    else
+    {
+      y = y+1
+    }
+  }  
+return (x/y)
+}
+
+proporcao(resultados)
+
+```
+
+
+ 4) Uma função chamada simulacao que tem os parâmetro k, n e p. 
+ Essa função deverá repetir o seguinte processo k vezes:
+ simular o lançamento de n moedas com probabilidade p de ser cara.
+ calcular a proporção de caras (1’s) obtidos nesses n lançamentos.
+ salvar a proporção calculada em um elemento do vetor. 
+ A função deve retornar um vetor com todas as proporções obtidas.
+
+
+```{r simulacao}
+
+simulacao <- function(k, n, p) {
+vetor <- c(1:k)
+for(i in 1:k) {
+##   cat("Processo nº = ",i," ") 
+ vetor[i]<- proporcao(moedas(n,p))  
+##   print(i)
+}
+print(vetor)
+}
+
+simulacao(25,45,0.8)
+
+```
+
+
+
