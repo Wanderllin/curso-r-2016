@@ -27,6 +27,91 @@ library(jpeg)
 library(tree)
 
 ```
+
+##Preparação do Banco de dados
+Para construir nossos bancos de dados, carregue as duas imagens abaixo (clique para download e salve na pasta do seu projeto):   
+## Imagem: purple_wave.jpg
+
+
+
+```{r}
+
+img <- readJPEG("purple_wave.jpg")
+
+
+img_dim <- dim(img)
+
+img_df <- data.frame(
+  x = rep(1:img_dim[2], each = img_dim[1]),
+  y = rep(img_dim[1]:1, img_dim[2]),
+  r = as.vector(img[,,1]),
+  g = as.vector(img[,,2]),
+  b = as.vector(img[,,3])
+) %>%
+  mutate(cor = rgb(r, g, b),
+         id = 1:n()) 
+
+
+```
+
+
+```{r}
+set.seed(1) 
+```
+
+
+### parte1 b= 0
+
+```{r}
+
+img_df_parte1 <- img_df %>% 
+  sample_frac(3/5) %>% # separando 3/5 do banco
+  mutate(b_backup = b, # backup do azul original
+         b = 0, # retirando o azul da imagem
+         cor = rgb(r, g, b)) # cor da imagem sem o azul
+
+
+```
+### total de pixel agora:
+
+```{r}
+dim(img_df_parte1)
+```
+
+
+
+### filtra os que não estão no img_df_parte1
+```{r}
+img_df_parte2 <- img_df %>% filter(!id%in%img_df_parte1$id) 
+```
+
+## Veja como fica a imagem original sem o azul
+
+```{r}
+ggplot(data = img_df_parte1, aes(x = x, y = y)) + 
+  geom_point(colour = img_df_parte1$cor) +
+  labs(x = "x", y = "y", title = "Imagem sem B (azul)") +
+  coord_fixed(ratio = 1) +
+  theme_bw()
+
+```
+
+  
+##   Veja como fica a imagem como é o azul original isolado.
+
+```{r}
+ggplot(data = img_df_parte2, aes(x = x, y = y)) + 
+  geom_point(colour = img_df_parte2$cor) +
+  labs(x = "x", y = "y", title = "Imagem sem B (azul)") +
+  coord_fixed(ratio = 1) +
+  theme_bw()
+
+```
+
+
+Para construir nossos bancos de dados, carregue as duas imagens abaixo (clique para download e salve na pasta do seu projeto):  
+## Imagem: xadrez_colorido.jpg
+
 Armazendo a imagem
 
 ```{r}
@@ -190,7 +275,3 @@ ggplot(mdf_predito_cores, aes(x = x, y = y)) +
   
   
   
-
-
-
-
