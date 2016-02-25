@@ -1,9 +1,21 @@
+---
+title: "Lab02 -  Aula 2"
+author: "Vanderlin Júnior - Curso Verão 2016 - R"
+date: "25 de fevereiro de 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Aula 02 - Laboratório - Curso R
+
+##Ler o arquivo arq.txt que se encontra na pasta "\curso-r-2016\arq.txt"
 
 
-######################################################################################
-## laboratório 2
+```{r arq.txt}
 
-arq <- 'C:\\Users\\Unifesp\\Documents\\curso-r-2016\\arq.txt'
 
 arq <- 'arq.txt'
 dados <- read.table(file = arq, header=TRUE, fill = TRUE)
@@ -25,15 +37,24 @@ str(dados)
 summary(dados)
 
 
-install.packages("readr")
+
+```
+
+## Incluindo library´s
+
+Abrindo bibliotecas
+
+```{r}
+
 library(readr)
-
-
-install.packages("dplyr")
 library(dplyr)
-
-install.packages("httr")
 library(httr)
+
+```
+
+Parte 2: descritiva básica
+
+```{r pressure, echo=FALSE}
 
 link_pnud <- 'https://www.dropbox.com/s/seqctcl46qeemgu/pnud_simplificado.rds?dl=1'
 tmp <- tempfile()
@@ -47,9 +68,13 @@ summary(pnud)
 pnud %>%
   select(1:10)
 
+```
 
-## Quais são os seis municípios com os maiores IDH municipais em 2010.
 
+Quais são os seis municípios com os maiores IDH municipais em 2010.
+
+
+```{r}
 pnud2 <- pnud[order(pnud$idhm,decreasing=TRUE),]
 
 pnud2 %>%
@@ -57,25 +82,24 @@ pnud2 %>%
   filter(ano==2010)  %>%
   select(municipio,idhm)
 
-## Qual é a unidade federativa com menor expectativa de vida média, 
+```
+
+Qual é a unidade federativa com menor expectativa de vida média, 
+
+```{r}
 
 pnud3 <- pnud[order(pnud$espvida,  decreasing=FALSE),]
 pnud3 %>%
-  ##  filter(ano==2010)  %>%
   group_by(ano, ufn, espvida) %>%
   select(ano,ufn,espvida)
 
 
-
-pnud_muni %>%
-  group_by(ano, ufn) %>%
-  summarise(populacao = sum(popt)) %>%
-  ungroup() %>%
-  spread(ano, populacao)
+```
 
 
-## ponderada pela população dos municípios em 2000.
+Ponderada pela população dos municípios em 2000.
 
+```{r}
 
 pnud %>%
   filter(ano==2000) %>%  
@@ -89,16 +113,22 @@ pnud %>%
             mort1_medio=mean(mort1),
             razdep_medio=mean(razdep),
             t_analf15m_medio=mean(t_analf15m)) %>%
-  arrange(desc(idhm_medio))
+  arrange(desc(idhm_medio)) %>% print(n=20)
 
 
-## Quais são os municípios outliers com relação ao índice de Gini em 1991 
-## e em 2010 (Dica: utilize como critério para determinar outliers valores 
-## maiores que a média mais duas vezes o desvio padrão).
+
+```
+
+
+ Quais são os municípios outliers com relação ao índice de Gini em 1991 
+ e em 2010 (Dica: utilize como critério para determinar outliers valores 
+ maiores que a média mais duas vezes o desvio padrão).
+ 
+```{r}
 
 summary(pnud$gini)
 
-sqrt(pnud$gini)*2
+##sqrt(pnud$gini)*2
 
 pnud %>%
   select(ano, ufn, municipio, gini) %>%
@@ -118,39 +148,13 @@ pnud %>%
   filter(ano==1991, (gini > (summary(pnud$gini)[4]+(2*sd(pnud$gini)))))
 
 
-pesquisa <- pnud %>%
-  select(ano, ufn, municipio, gini) %>%
+pesquisa <- pnud %>% 
+  select(ano, ufn, municipio, gini) %>% 
   filter(ano==2010, (gini > (summary(pnud$gini)[4]+(2*sd(pnud$gini)))))
 
 head(pesquisa,61)
 
-tail(pesquisa,5)
-pesquisa[1:100,]
 
-?head
-View(pesquisa)?
-?save
-history(max.show)
-
-summary(pnud$gini)[4]
+```
 
 
-install.packages("ggplot2")
-library(ggplot2)
-
-
-ggplot(pesquisa, aes(x = municipio, y = gini)) + 
-  geom_point()
-
-ggplot(pesquisa, aes(x = municipio, y = gini)) + geom_point()
-------------------------------------------------------
-  
-  
-  
-  ## Outras atividades:
-  
-  ## Categorize a renda per capita e associe com a expectativa de vida.
-  ## No nordeste o aumento de distribuição de renda foi maior do que no sudeste?
-  ## Insira mais pelo menos 3 estudos que você ache interessante.
-  
-  
