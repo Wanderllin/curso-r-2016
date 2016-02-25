@@ -56,7 +56,16 @@ ggplot(data = diamonds, aes(x = price, y = carat)) +
 ggplot(data = diamonds, aes(x = price)) + 
   geom_histogram(fill=I("blue"),binwidth = 500,col=I("red")) +
   xlab("Preço") +
-  ylab("Frequência")
+  ylab("Frequência") +
+  geom_density(data=diamonds, aes(x=price, group=carat),alpha=0.5, adjust=2) + 
+  xlab("Preço") +
+  ylab("Frequência") 
+
+
+ggplot() + 
+  geom_density(data=ddf, aes(x=MEI, group=Region, fill=Region),alpha=0.5, adjust=2) + 
+  xlab("MEI") +
+  ylab("Density")
 
 
 
@@ -110,7 +119,47 @@ ggplot(data = diamonds, aes(x = as.factor(cut), fill = as.factor(cut))) +
 
 
 
+##############
+library(dplyr)
+library(ggplot2)
+library(tidyr)
 
+economics %>%
+  select(date, unemploy, uempmed) %>%
+  gather(indice, valor, -date) %>%
+  group_by(indice) %>%
+  mutate(valor_pad = (valor - min(valor))/(max(valor)-min(valor))) %>%
+  ggplot(aes(x = date, y=valor_pad, colour = indice))+
+  ###    geom_line()+
+  geom_line()+
+  scale_color_manual("indice", values = c("red", "blue"),
+                     labels = c("Desemprego", "Tempo Desemprego")) +
+  labs(x= "Data", y = "Valor")
+
+
+
+
+
+
+## um modelo de regressão
+
+coef(lm(price ~ carat , data = diamonds))
+
+ggplot(data = diamonds %>% sample_n(1000), aes(x = carat, y = price)) + 
+  geom_point() +
+  geom_abline(intercept = -2256.361, slope = 7756.426, color = "blue", size = 5) 
+
+## suavizer as variaveis por um modelo de regressão
+ggplot(data = diamonds %>% sample_n(1000), aes(x = carat, y = price)) + 
+  geom_point() +
+  geom_smooth(method = "lm" , se= F)
+geom_abline(intercept = -2256.361, slope = 7756.426, color = "blue", size = 5) 
+
+## suavizer as variaveis por um modelo de regressão
+ggplot(data = diamonds %>% sample_n(1000), aes(x = carat, y = price)) + 
+  geom_point() +
+  geom_smooth(se= F, method = "lm") + facet_wrap(~cut)
+geom_abline(intercept = -2256.361, slope = 7756.426, color = "red", size = 5) 
 
 
 

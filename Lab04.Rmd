@@ -12,6 +12,8 @@ Carregando as bibliotecas
 
 ```{r}
 library(ggplot2)
+library(dplyr)
+library(tidyr)
 
 ```
 
@@ -75,21 +77,13 @@ ggplot(data = diamonds, aes(x = price, y = carat)) +
 ggplot(data = diamonds, aes(x = price)) + 
   geom_histogram(fill=I("blue"),binwidth = 500,col=I("red")) +
   xlab("Preço") +
-  ylab("Frequência")
+  ylab("Frequência") +
+  geom_density(data=diamonds, aes(x=price, group=carat),alpha=0.5, adjust=2) + 
+  xlab("Preço") +
+  ylab("Frequência") 
 
 
 ```
-
-ggplot(data = diamonds, aes(x = price)) + 
-  geom_histogram(..density..)+
-  xlab("Preço") +
-  ylab("Frequência")
-
-
-ggplot(data = diamonds, aes(x = price)) + 
-  geom_density() +
-  xlab("Preço") +
-  ylab("Frequência")
 
 
 ## geom_boxplot
@@ -117,7 +111,6 @@ ggplot(data = diamonds, aes(x = as.factor(cut), y = price)) +
 ## geom_bar
 ## 10. Quais são os aspectos estéticos (aesthetics) exigidos (obrigatórios) da função geom_bar()?
 
-
 ## 11. Faça um gráfico de barras do número de diamantes em cada categoria da variável cor (color).
 
 ```{r}
@@ -126,3 +119,34 @@ ggplot(data = diamonds, aes(x = as.factor(cut), fill = as.factor(cut))) +
   labs(fill = "corte")
 
 ```
+## um modelo de regressão
+```{r}
+coef(lm(price ~ carat , data = diamonds))
+
+ggplot(data = diamonds %>% sample_n(1000), aes(x = carat, y = price)) + 
+  geom_point() +
+  geom_abline(intercept = -2256.361, slope = 7756.426, color = "blue", size = 5) 
+
+```
+
+## suavizer as variaveis por um modelo de regressão
+```{r}
+ggplot(data = diamonds %>% sample_n(1000), aes(x = carat, y = price)) + 
+  geom_point() +
+  geom_smooth(method = "lm" , se= F)
+geom_abline(intercept = -2256.361, slope = 7756.426, color = "blue", size = 5) 
+
+```
+
+
+## suavizer as variaveis por um modelo de regressão
+
+```{r}
+ggplot(data = diamonds %>% sample_n(1000), aes(x = carat, y = price)) + 
+  geom_point() +
+  geom_smooth(se= F, method = "lm") + facet_wrap(~cut)
+geom_abline(intercept = -2256.361, slope = 7756.426, color = "red", size = 5) 
+
+```
+
+
