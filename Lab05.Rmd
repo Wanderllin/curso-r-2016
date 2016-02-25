@@ -1,0 +1,196 @@
+---
+title: "Lab05"
+author: "Vanderlin Amorim Júnior - Curso Verão 2016 - Curso R"
+date: "25 de fevereiro de 2016"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Aula 05 - Laboratório
+
+## Recuperação de imagem
+
+
+
+A bibliotecas utilizadas
+
+```{r}
+
+library(magrittr)
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+library(jpeg)
+library(tree)
+
+```
+Armazendo a imagem
+
+```{r}
+img <- readJPEG("xadrez_colorido.jpg")
+img_dim <- dim(img)
+
+img_df <- data.frame(
+  x = rep(1:img_dim[2], each = img_dim[1]),
+  y = rep(img_dim[1]:1, img_dim[2]),
+  r = as.vector(img[,,1]),
+  g = as.vector(img[,,2]),
+  b = as.vector(img[,,3])
+) %>%
+  mutate(cor = rgb(r, g, b),
+         id = 1:n())
+
+```
+
+###img_dim
+
+###img_dim <- dim(img)
+
+### ggplot(data = img)
+
+```{r}
+img_df <- data.frame(
+  x = rep(1:img_dim[2], each = img_dim[1]),
+  y = rep(img_dim[1]:1, img_dim[2]),
+  r = as.vector(img[,,1]),
+  g = as.vector(img[,,2]),
+  b = as.vector(img[,,3])
+) %>%
+  mutate(cor = rgb(r, g, b),
+         id = 1:n())
+         
+
+```
+
+         
+mais codigo:
+
+```{r}
+img_df_parte1 <- img_df %>%
+  sample_frac(3/5) %>% # separando 3/5 do banco
+  mutate(b_backup = b, # backup do azul original
+         b = 0, # retirando o azul da imagem
+         cor = rgb(r, g, b)) # cor da imagem sem o azul
+
+dim(img_df_parte1)
+
+```
+
+
+```{r}
+img_df_parte2 <- img_df %>% filter(!id%in%img_df_parte1$id)
+
+
+
+```
+
+
+## Exercício 5: Outra Imagem
+Repita os exercícios de 1 a 4, mas agora para a imagem xadrez_colorido.jpg.
+Quanto ao desempenho para recuperar o azul de imagens, teve uma técnica melhor?
+Resposta: foi pela técnica da árvores de decisão
+
+### pelo modelo da regressão linear  
+```{r}
+modelo_lm = lm(b~r+g+x+y,data=img_df_parte2)
+```
+
+
+
+### pelo modelo da árvores de decisão
+
+```{r}
+modelo_tree = tree(b~r+g+x+y,data=img_df_parte2)
+```
+
+
+
+```{r}
+img_df_parte1 <- img_df %>%
+  sample_frac(3/5) %>% # separando 3/5 do banco
+  mutate(b_backup = b, # backup do azul original
+         b = 0, # retirando o azul da imagem
+         cor = rgb(r, g, b)) # cor da imagem sem o azul
+
+dim(img_df_parte1)
+
+```
+
+
+```{r}
+predito_lm <- predict(modelo_lm,img_df_parte1)
+
+summary(predito_lm)
+
+```
+
+
+```{r}
+predito_tree <- predict(modelo_tree,img_df_parte1)
+
+summary(predito_tree)
+
+summary(img_df_parte1)
+
+```
+
+
+```{r}
+mdf_predito_x <- img_df_parte1 %>%
+  mutate(predito_lm,predito_tree)
+
+summary(mdf_predito_x)
+
+
+?summary
+
+```
+
+
+
+```{r}
+mean((mdf_predito_x$b_backup-mdf_predito_x$predito_lm)^2)
+
+
+mean((mdf_predito_x$b_backup-mdf_predito_x$predito_tree)^2)
+
+mdf_predito_cores <- mdf_predito_x %>%
+  mutate(predito_lm = ifelse(predito_lm < 0, 0, predito_lm),
+         predito_tree = ifelse(predito_tree < 0, 0, predito_tree)) %>%
+  mutate(cor_lm = rgb(r, g, predito_lm),
+         cor_tree = rgb(r, g, predito_tree))
+
+```
+
+## Tentativa de recuperação do azul pela regressão linear           
+
+```{r}
+ggplot(mdf_predito_cores, aes(x = x, y = y)) +
+  geom_point(colour = mdf_predito_cores$cor_lm) +
+  labs(x = "x", y = "y", title = "Imagem sem B (azul)") +
+  coord_fixed(ratio = 1) +
+  theme_bw()
+
+```
+         
+  
+##   Tentativa de recuperação do azul pela   árvores de decisão        
+  
+```{r}
+ggplot(mdf_predito_cores, aes(x = x, y = y)) +
+  geom_point(colour = mdf_predito_cores$cor_tree) +
+  labs(x = "x", y = "y", title = "Imagem sem B (azul)") +
+  coord_fixed(ratio = 1) +
+  theme_bw()
+
+```
+  
+  
+  
+
+
+
+
